@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscripción al Gimnasio — Formulario Validado</title>
+  <meta name="description" content="Formulario de inscripción al gimnasio con validación en tiempo real usando HTML5, CSS3 y JavaScript puro.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="contenedor">
+    <div class="tarjeta-formulario">
+      <header class="cabecera">
+        <h1>Inscripción al Gimnasio</h1>
+        <p class="subtitulo">
+          Completa los datos para tramitar tu alta. Los requisitos de cada campo se actualizan en tiempo real mientras escribes.
+        </p>
+        <p class="nota-obligatorios">
+          Los campos con <span class="obligatorio">*</span> son obligatorios. Los demás están indicados como opcionales.
+        </p>
+      </header>
+
+      <!-- Mensaje general al intentar enviar el formulario -->
+      <div id="mensaje-formulario" class="mensaje-estado" role="alert" aria-live="polite" hidden></div>
+
+      <form id="formulario-inscripcion" action="#" method="post" novalidate>
+
+        <!-- 1. DATOS PERSONALES -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">1. Datos personales</legend>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="nombre">Nombre <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                placeholder="Ej. Mario"
+                autocomplete="given-name"
+                required
+                minlength="2"
+                maxlength="40"
+              >
+              <ul class="requisitos" id="req-nombre" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="apellidos">Apellidos <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="apellidos"
+                name="apellidos"
+                placeholder="Ej. Sánchez Ruiz"
+                autocomplete="family-name"
+                required
+                minlength="2"
+                maxlength="80"
+              >
+              <ul class="requisitos" id="req-apellidos" aria-live="polite"></ul>
+            </div>
+          </div>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="dni">DNI / NIE <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="dni"
+                name="dni"
+                placeholder="Ej. 12345678Z o X1234567L"
+                required
+                minlength="9"
+                maxlength="9"
+                pattern="^([0-9]{8}|[XYZxyz][0-9]{7})[A-Za-z]$"
+              >
+              <ul class="requisitos" id="req-dni" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="fecha-nacimiento">Fecha de nacimiento <span class="obligatorio">*</span></label>
+              <input
+                type="date"
+                id="fecha-nacimiento"
+                name="fecha_nacimiento"
+                required
+              >
+              <ul class="requisitos" id="req-fecha-nacimiento" aria-live="polite"></ul>
+            </div>
+          </div>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="sexo">Sexo <span class="opcional">(Opcional)</span></label>
+              <select id="sexo" name="sexo">
+                <option value="">Selecciona una opción</option>
+                <option value="femenino">Femenino</option>
+                <option value="masculino">Masculino</option>
+                <option value="no-indicar">Prefiero no decirlo</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="estado-civil">Estado civil <span class="opcional">(Opcional)</span></label>
+              <select id="estado-civil" name="estado_civil">
+                <option value="">Selecciona una opción</option>
+                <option value="soltero">Soltero/a</option>
+                <option value="casado">Casado/a</option>
+                <option value="pareja">Pareja de hecho</option>
+                <option value="divorciado">Divorciado/a</option>
+                <option value="viudo">Viudo/a</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 2. INFORMACIÓN DE CONTACTO -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">2. Información de contacto</legend>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="email">Correo electrónico <span class="obligatorio">*</span></label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="nombre@correo.com"
+                autocomplete="email"
+                required
+              >
+              <ul class="requisitos" id="req-email" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="telefono">Teléfono móvil <span class="obligatorio">*</span></label>
+              <input
+                type="tel"
+                id="telefono"
+                name="telefono"
+                placeholder="Ej. 600123456 o +34 600 123 456"
+                autocomplete="tel"
+                required
+                minlength="9"
+                maxlength="18"
+              >
+              <ul class="requisitos" id="req-telefono" aria-live="polite"></ul>
+            </div>
+          </div>
+
+          <div class="campo">
+            <span class="etiqueta-grupo">Preferencia de contacto <span class="opcional">(Opcional)</span></span>
+            <div class="grupo-opciones">
+              <label class="opcion-chip">
+                <input type="radio" name="contacto_pref" value="email" checked>
+                <span>Correo electrónico</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="radio" name="contacto_pref" value="telefono">
+                <span>Teléfono</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="radio" name="contacto_pref" value="whatsapp">
+                <span>WhatsApp</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 3. DIRECCIÓN -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">3. Dirección</legend>
+
+          <div class="campo">
+            <label for="direccion">Dirección (calle y número) <span class="obligatorio">*</span></label>
+            <input
+              type="text"
+              id="direccion"
+              name="direccion"
+              placeholder="Ej. Calle Mayor, 12, 2ºB"
+              autocomplete="street-address"
+              required
+              minlength="5"
+              maxlength="120"
+            >
+            <ul class="requisitos" id="req-direccion" aria-live="polite"></ul>
+          </div>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="ciudad">Ciudad <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="ciudad"
+                name="ciudad"
+                placeholder="Ej. Madrid"
+                autocomplete="address-level2"
+                required
+                minlength="2"
+                maxlength="60"
+              >
+              <ul class="requisitos" id="req-ciudad" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="codigo-postal">Código postal <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="codigo-postal"
+                name="codigo_postal"
+                inputmode="numeric"
+                placeholder="Ej. 28001"
+                autocomplete="postal-code"
+                required
+                minlength="5"
+                maxlength="5"
+                pattern="^[0-9]{5}$"
+              >
+              <ul class="requisitos" id="req-codigo-postal" aria-live="polite"></ul>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 4. INFORMACIÓN MÉDICA -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">4. Información médica</legend>
+
+          <div class="fila fila-tres">
+            <div class="campo">
+              <label for="altura">Altura (cm) <span class="obligatorio">*</span></label>
+              <input
+                type="number"
+                id="altura"
+                name="altura"
+                placeholder="Ej. 175"
+                required
+                min="120"
+                max="230"
+                step="1"
+              >
+              <ul class="requisitos" id="req-altura" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="peso">Peso (kg) <span class="obligatorio">*</span></label>
+              <input
+                type="number"
+                id="peso"
+                name="peso"
+                placeholder="Ej. 72.5"
+                required
+                min="35"
+                max="250"
+                step="0.1"
+              >
+              <ul class="requisitos" id="req-peso" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="nivel-actividad">Nivel de actividad <span class="opcional">(Opcional)</span></label>
+              <select id="nivel-actividad" name="nivel_actividad">
+                <option value="">Selecciona una opción</option>
+                <option value="sedentario">Sedentario</option>
+                <option value="ligero">Ligero (1–2 días/sem)</option>
+                <option value="moderado">Moderado (3–4 días/sem)</option>
+                <option value="intenso">Intenso (5–6 días/sem)</option>
+                <option value="atleta">Atleta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="campo" id="campo-condiciones">
+            <span class="etiqueta-grupo">Condiciones médicas conocidas <span class="obligatorio">*</span></span>
+            <div class="grupo-opciones" id="grupo-condiciones" role="group" aria-label="Condiciones médicas">
+              <label class="opcion-chip">
+                <input type="checkbox" name="condiciones" value="cardiacas">
+                <span>Cardíacas</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="checkbox" name="condiciones" value="respiratorias">
+                <span>Respiratorias</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="checkbox" name="condiciones" value="metabolicas">
+                <span>Metabólicas</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="checkbox" name="condiciones" value="lesiones">
+                <span>Lesiones recientes</span>
+              </label>
+              <label class="opcion-chip">
+                <input type="checkbox" name="condiciones" value="ninguna">
+                <span>Ninguna</span>
+              </label>
+            </div>
+            <ul class="requisitos" id="req-condiciones" aria-live="polite"></ul>
+          </div>
+        </fieldset>
+
+        <!-- 5. OBJETIVOS DEPORTIVOS -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">5. Objetivos deportivos</legend>
+
+          <div class="campo">
+            <label for="objetivos">Objetivos principales <span class="obligatorio">*</span></label>
+            <textarea
+              id="objetivos"
+              name="objetivos"
+              rows="3"
+              placeholder="Ej. Mejorar mi resistencia, ganar masa muscular y mantener hábitos saludables..."
+              required
+              maxlength="500"
+            ></textarea>
+            <ul class="requisitos" id="req-objetivos" aria-live="polite"></ul>
+          </div>
+        </fieldset>
+
+        <!-- 6. TIPO DE MEMBRESÍA -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">6. Tipo de membresía</legend>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="plan">Plan de membresía <span class="obligatorio">*</span></label>
+              <select id="plan" name="plan" required>
+                <option value="">Selecciona un plan</option>
+                <option value="mensual">Mensual — 29 €/mes</option>
+                <option value="trimestral">Trimestral (-5%) — 27,55 €/mes</option>
+                <option value="anual">Anual (-12%) — 25,50 €/mes</option>
+                <option value="premium">Premium + Clases — 49 €/mes</option>
+              </select>
+              <ul class="requisitos" id="req-plan" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="referido">¿Quién te refirió? <span class="opcional">(Opcional)</span></label>
+              <input
+                type="text"
+                id="referido"
+                name="referido"
+                placeholder="Nombre de amigo o código promocional"
+                maxlength="30"
+              >
+            </div>
+          </div>
+
+          <div class="resumen-tarifas">
+            <div class="tarifa-item">
+              <span class="tarifa-nombre">Plan Básico</span>
+              <span class="tarifa-precio">29 €/mes</span>
+              <span class="tarifa-detalle">Acceso completo a sala de musculación y cardio</span>
+            </div>
+            <div class="tarifa-item">
+              <span class="tarifa-nombre">Plan Premium</span>
+              <span class="tarifa-precio">49 €/mes</span>
+              <span class="tarifa-detalle">Incluye sala, clases grupales ilimitadas y seguimiento</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 7. HORARIOS -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">7. Horarios</legend>
+
+          <div class="fila fila-dos">
+            <div class="campo">
+              <label for="franja-horaria">Franja horaria preferida <span class="obligatorio">*</span></label>
+              <select id="franja-horaria" name="franja_horaria" required>
+                <option value="">Selecciona una franja horaria</option>
+                <option value="06-09">06:00 – 09:00</option>
+                <option value="09-12">09:00 – 12:00</option>
+                <option value="12-16">12:00 – 16:00</option>
+                <option value="16-19">16:00 – 19:00</option>
+                <option value="19-22">19:00 – 22:00</option>
+              </select>
+              <ul class="requisitos" id="req-franja-horaria" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="clases">Clases grupales <span class="opcional">(Opcional)</span></label>
+              <select id="clases" name="clases" multiple size="4">
+                <option value="spinning">Spinning</option>
+                <option value="crossfit">CrossFit</option>
+                <option value="yoga">Yoga</option>
+                <option value="pilates">Pilates</option>
+                <option value="boxeo">Boxeo</option>
+              </select>
+              <p class="ayuda">Mantén Ctrl (o ⌘ en Mac) para seleccionar varias clases.</p>
+            </div>
+          </div>
+
+          <div class="campo">
+            <span class="etiqueta-grupo">Días preferidos <span class="opcional">(Opcional)</span></span>
+            <div class="grupo-opciones">
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="lu"><span>Lun</span></label>
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="ma"><span>Mar</span></label>
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="mi"><span>Mié</span></label>
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="ju"><span>Jue</span></label>
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="vi"><span>Vie</span></label>
+              <label class="opcion-chip"><input type="checkbox" name="dias" value="sa"><span>Sáb</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 8. FACTURACIÓN -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">8. Facturación</legend>
+
+          <div class="fila fila-tres">
+            <div class="campo">
+              <label for="nif-factura">NIF / NIE para factura <span class="opcional">(Opcional)</span></label>
+              <input
+                type="text"
+                id="nif-factura"
+                name="nif_factura"
+                placeholder="Ej. B12345678"
+                maxlength="9"
+              >
+              <ul class="requisitos" id="req-nif-factura" aria-live="polite"></ul>
+            </div>
+
+            <div class="campo">
+              <label for="direccion-factura">Dirección de facturación <span class="opcional">(Opcional)</span></label>
+              <input
+                type="text"
+                id="direccion-factura"
+                name="direccion_factura"
+                placeholder="Si es distinta a la postal"
+                maxlength="120"
+              >
+            </div>
+
+            <div class="campo">
+              <label for="iban">IBAN (últimos 4 dígitos) <span class="obligatorio">*</span></label>
+              <input
+                type="text"
+                id="iban"
+                name="iban"
+                inputmode="numeric"
+                placeholder="Ej. 1234"
+                required
+                minlength="4"
+                maxlength="4"
+                pattern="^[0-9]{4}$"
+              >
+              <ul class="requisitos" id="req-iban" aria-live="polite"></ul>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 9. CONSENTIMIENTOS -->
+        <fieldset class="seccion">
+          <legend class="titulo-seccion">9. Consentimientos</legend>
+
+          <div class="campo campo-checkbox">
+            <label class="etiqueta-checkbox" for="tos">
+              <input type="checkbox" id="tos" name="tos" required>
+              <span>Acepto los términos y condiciones del gimnasio <span class="obligatorio">*</span></span>
+            </label>
+            <ul class="requisitos" id="req-tos" aria-live="polite"></ul>
+          </div>
+
+          <div class="campo campo-checkbox">
+            <label class="etiqueta-checkbox" for="rgpd">
+              <input type="checkbox" id="rgpd" name="rgpd" required>
+              <span>Autorizo el tratamiento de mis datos conforme a la política de privacidad (RGPD) <span class="obligatorio">*</span></span>
+            </label>
+            <ul class="requisitos" id="req-rgpd" aria-live="polite"></ul>
+          </div>
+
+          <div class="campo campo-checkbox">
+            <label class="etiqueta-checkbox" for="promo">
+              <input type="checkbox" id="promo" name="promo">
+              <span>Deseo recibir promociones y novedades por correo electrónico <span class="opcional">(Opcional)</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="acciones">
+          <button type="reset" class="boton boton-secundario">Limpiar formulario</button>
+          <button type="submit" class="boton boton-primario">Enviar solicitud</button>
+        </div>
+      </form>
+    </div>
+
+    <footer class="pie">
+      <p>Formulario Validado · Actividad de HTML5, CSS3 y JavaScript puro</p>
+    </footer>
+  </main>
+
+  <script src="js/validation.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
