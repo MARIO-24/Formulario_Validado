@@ -88,13 +88,14 @@ El formulario conserva los apartados principales del proyecto de referencia, dif
 
 El archivo `js/validation.js` contiene una función pequeña por cada campo (por ejemplo, `validarEmail`, `validarDni` o `validarFechaNacimiento`). Cada función devuelve una lista de requisitos indicando si se cumplen o no.
 
-El archivo `js/main.js` escucha los eventos `focus`, `input`, `blur`, `change`, `submit` y `reset`:
+El archivo `js/main.js` escucha los eventos `focus`, `input`, `blur`, `focusout`, `change`, `submit` y `reset`:
 
-- Al entrar o escribir en un campo, aparece debajo su lista de requisitos:
+- Al **pulsar en un campo**, aparece debajo su lista de requisitos actualizada en tiempo real:
   - **Gris (`•`)**: requisito pendiente mientras el usuario escribe por primera vez.
   - **Verde (`✓`)**: requisito cumplido correctamente.
   - **Rojo (`✕`)**: requisito incumplido después de salir del campo (`blur`), cambiar una selección (`change`) o intentar enviar el formulario (`submit`).
+- Al **salir del campo o pulsar en otro**, la lista de requisitos se oculta automáticamente y el campo conserva su borde verde o rojo para indicar su estado.
 - Al pulsar **Enviar solicitud**:
   1. Se comprueban todos los campos a la vez.
-  2. Si falta algún requisito, se impide el envío, se muestran los errores en rojo y el foco salta al primer campo pendiente.
+  2. Si falta algún requisito, se impide el envío, los campos con error quedan marcados en rojo y el foco salta al primer campo pendiente mostrando sus requisitos.
   3. Si todo está correcto, se muestra un mensaje de confirmación en verde.

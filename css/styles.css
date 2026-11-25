@@ -353,6 +353,14 @@ textarea.campo-invalido:focus {
   cursor: pointer;
 }
 
+.etiqueta-checkbox.campo-invalido {
+  color: var(--rojo-texto);
+}
+
+.grupo-opciones.campo-invalido .opcion-chip {
+  border-color: var(--rojo-borde);
+}
+
 .resumen-tarifas {
   display: grid;
   grid-template-columns: 1fr;

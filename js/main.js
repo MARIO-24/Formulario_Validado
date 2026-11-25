@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const formulario = document.getElementById("formulario-inscripcion");
   const mensajeFormulario = document.getElementById("mensaje-formulario");
+  const grupoCondiciones = document.getElementById("grupo-condiciones");
   const checkboxesCondiciones = document.querySelectorAll('input[name="condiciones"]');
 
   // Lista de campos que tienen validación individual
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "rgpd"
   ];
 
-  // Dibuja la lista de requisitos debajo de un campo con su estado visual
+  // Dibuja y muestra la lista de requisitos debajo de un campo
   function mostrarRequisitos(listaElemento, requisitos, mostrarErrores) {
     if (!listaElemento) {
       return;
@@ -57,13 +58,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Aplica el borde verde o rojo al campo según su validez
+  // Oculta la lista de requisitos de un campo
+  function ocultarRequisitos(listaElemento) {
+    if (!listaElemento) {
+      return;
+    }
+
+    listaElemento.classList.remove("visible");
+    listaElemento.innerHTML = "";
+  }
+
+  // Oculta todas las listas de requisitos abiertas antes de mostrar una nueva
+  function ocultarTodosLosRequisitos() {
+    for (let i = 0; i < camposValidados.length; i++) {
+      ocultarRequisitos(document.getElementById("req-" + camposValidados[i]));
+    }
+    ocultarRequisitos(document.getElementById("req-condiciones"));
+  }
+
+  // Aplica el borde o estado visual verde/rojo al campo según su validez
   function actualizarEstiloCampo(campo, esValido, mostrarErrores, esOpcionalVacio) {
     if (campo.type === "checkbox") {
+      const etiqueta = campo.parentElement;
       if (!esValido && mostrarErrores) {
         campo.setAttribute("aria-invalid", "true");
+        if (etiqueta) {
+          etiqueta.classList.add("campo-invalido");
+        }
       } else {
         campo.removeAttribute("aria-invalid");
+        if (etiqueta) {
+          etiqueta.classList.remove("campo-invalido");
+        }
       }
       return;
     }
@@ -111,20 +137,17 @@ document.addEventListener("DOMContentLoaded", function () {
     return [];
   }
 
-  // Valida un campo concreto, pinta sus requisitos y devuelve true o false
-  function validarCampo(campo, mostrarErrores) {
+  // Valida un campo, actualiza su borde y muestra u oculta su lista de requisitos
+  function validarCampo(campo, mostrarErrores, mostrarLista) {
     const lista = document.getElementById("req-" + campo.id);
     const requisitos = obtenerRequisitosCampo(campo);
     const esValido = todosRequisitosCumplidos(requisitos);
     const esOpcionalVacio = requisitos.length === 1 && requisitos[0].cumplido === null;
 
-    if (esOpcionalVacio && document.activeElement !== campo) {
-      if (lista) {
-        lista.classList.remove("visible");
-        lista.innerHTML = "";
-      }
-    } else {
+    if (mostrarLista) {
       mostrarRequisitos(lista, requisitos, mostrarErrores);
+    } else {
+      ocultarRequisitos(lista);
     }
 
     actualizarEstiloCampo(campo, esValido, mostrarErrores, esOpcionalVacio);
@@ -133,12 +156,25 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Valida el grupo de checkboxes de condiciones médicas
-  function validarGrupoCondiciones(mostrarErrores) {
+  function validarGrupoCondiciones(mostrarErrores, mostrarLista) {
     const lista = document.getElementById("req-condiciones");
     const requisitos = validarCondicionesMedicas(checkboxesCondiciones);
     const esValido = todosRequisitosCumplidos(requisitos);
 
-    mostrarRequisitos(lista, requisitos, mostrarErrores);
+    if (mostrarLista) {
+      mostrarRequisitos(lista, requisitos, mostrarErrores);
+    } else {
+      ocultarRequisitos(lista);
+    }
+
+    if (grupoCondiciones) {
+      if (!esValido && mostrarErrores) {
+        grupoCondiciones.classList.add("campo-invalido");
+      } else {
+        grupoCondiciones.classList.remove("campo-invalido");
+      }
+    }
+
     return esValido;
   }
 
@@ -201,20 +237,24 @@ document.addEventListener("DOMContentLoaded", function () {
       continue;
     }
 
+    // Al pulsar/entrar en el campo, mostramos solo sus requisitos
     campo.addEventListener("focus", function () {
+      ocultarTodosLosRequisitos();
       const yaTocado = campo.dataset.tocado === "true";
-      validarCampo(campo, yaTocado);
+      validarCampo(campo, yaTocado, true);
     });
 
+    // Mientras escribe, actualizamos los requisitos en tiempo real
     campo.addEventListener("input", function () {
       ocultarMensajeGeneral();
       const yaTocado = campo.dataset.tocado === "true";
-      validarCampo(campo, yaTocado);
+      validarCampo(campo, yaTocado, true);
     });
 
+    // Al salir del campo o pulsar en otro, actualizamos el borde y ocultamos los requisitos
     campo.addEventListener("blur", function () {
       campo.dataset.tocado = "true";
-      validarCampo(campo, true);
+      validarCampo(campo, true, false);
     });
 
     // En selects, fechas y checkboxes validamos al cambiar el valor
@@ -222,26 +262,47 @@ document.addEventListener("DOMContentLoaded", function () {
       campo.addEventListener("change", function () {
         ocultarMensajeGeneral();
         campo.dataset.tocado = "true";
-        validarCampo(campo, true);
+        validarCampo(campo, true, true);
       });
     }
   }
 
   // Conecta los eventos de los checkboxes de condiciones médicas
   for (let i = 0; i < checkboxesCondiciones.length; i++) {
+    checkboxesCondiciones[i].addEventListener("focus", function () {
+      ocultarTodosLosRequisitos();
+      const yaTocado = grupoCondiciones && grupoCondiciones.dataset.tocado === "true";
+      validarGrupoCondiciones(yaTocado, true);
+    });
+
     checkboxesCondiciones[i].addEventListener("change", function (evento) {
       ocultarMensajeGeneral();
+      if (grupoCondiciones) {
+        grupoCondiciones.dataset.tocado = "true";
+      }
       actualizarExclusividadCondiciones(evento.target);
-      validarGrupoCondiciones(true);
+      validarGrupoCondiciones(true, true);
+    });
+  }
+
+  // Al salir del grupo de condiciones médicas, ocultamos su lista de requisitos
+  if (grupoCondiciones) {
+    grupoCondiciones.addEventListener("focusout", function (evento) {
+      if (!grupoCondiciones.contains(evento.relatedTarget)) {
+        grupoCondiciones.dataset.tocado = "true";
+        validarGrupoCondiciones(true, false);
+      }
     });
   }
 
   // Comprueba todo el formulario al pulsar "Enviar solicitud"
   formulario.addEventListener("submit", function (evento) {
     evento.preventDefault();
+    ocultarTodosLosRequisitos();
 
     let totalErrores = 0;
     let primerCampoConError = null;
+    let errorEnCondiciones = false;
 
     for (let i = 0; i < camposValidados.length; i++) {
       const campo = document.getElementById(camposValidados[i]);
@@ -250,7 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       campo.dataset.tocado = "true";
-      const esValido = validarCampo(campo, true);
+      const esValido = validarCampo(campo, true, false);
 
       if (!esValido) {
         totalErrores = totalErrores + 1;
@@ -260,11 +321,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    const condicionesValidas = validarGrupoCondiciones(true);
+    if (grupoCondiciones) {
+      grupoCondiciones.dataset.tocado = "true";
+    }
+    const condicionesValidas = validarGrupoCondiciones(true, false);
     if (!condicionesValidas) {
       totalErrores = totalErrores + 1;
       if (!primerCampoConError && checkboxesCondiciones.length > 0) {
         primerCampoConError = checkboxesCondiciones[0];
+        errorEnCondiciones = true;
       }
     }
 
@@ -278,6 +343,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (primerCampoConError) {
         primerCampoConError.focus();
+        if (errorEnCondiciones) {
+          validarGrupoCondiciones(true, true);
+        } else {
+          validarCampo(primerCampoConError, true, true);
+        }
         primerCampoConError.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     } else {
@@ -296,27 +366,24 @@ document.addEventListener("DOMContentLoaded", function () {
   formulario.addEventListener("reset", function () {
     setTimeout(function () {
       ocultarMensajeGeneral();
+      ocultarTodosLosRequisitos();
 
       for (let i = 0; i < camposValidados.length; i++) {
         const campo = document.getElementById(camposValidados[i]);
-        const lista = document.getElementById("req-" + camposValidados[i]);
 
         if (campo) {
           delete campo.dataset.tocado;
           campo.classList.remove("campo-valido", "campo-invalido");
           campo.removeAttribute("aria-invalid");
-        }
-
-        if (lista) {
-          lista.classList.remove("visible");
-          lista.innerHTML = "";
+          if (campo.type === "checkbox" && campo.parentElement) {
+            campo.parentElement.classList.remove("campo-invalido");
+          }
         }
       }
 
-      const listaCondiciones = document.getElementById("req-condiciones");
-      if (listaCondiciones) {
-        listaCondiciones.classList.remove("visible");
-        listaCondiciones.innerHTML = "";
+      if (grupoCondiciones) {
+        delete grupoCondiciones.dataset.tocado;
+        grupoCondiciones.classList.remove("campo-invalido");
       }
 
       for (let i = 0; i < checkboxesCondiciones.length; i++) {
