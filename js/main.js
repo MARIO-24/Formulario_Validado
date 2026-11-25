@@ -5,10 +5,17 @@
 document.addEventListener("DOMContentLoaded", function () {
   const formulario = document.getElementById("formulario-inscripcion");
   const mensajeFormulario = document.getElementById("mensaje-formulario");
+
+  const grupoSexo = document.getElementById("grupo-sexo");
+  const radiosSexo = document.querySelectorAll('input[name="sexo"]');
+
   const grupoCondiciones = document.getElementById("grupo-condiciones");
   const checkboxesCondiciones = document.querySelectorAll('input[name="condiciones"]');
 
-  // Lista de campos que tienen validación individual
+  const grupoPlan = document.getElementById("grupo-plan");
+  const radiosPlan = document.querySelectorAll('input[name="plan"]');
+
+  // Campos individuales con validación
   const camposValidados = [
     "nombre",
     "apellidos",
@@ -22,7 +29,30 @@ document.addEventListener("DOMContentLoaded", function () {
     "altura",
     "peso",
     "objetivos",
-    "plan",
+    "franja-horaria",
+    "nif-factura",
+    "iban",
+    "tos",
+    "rgpd"
+  ];
+
+  // Orden exacto de validación al enviar para enfocar el primer campo con error
+  const ordenEnvio = [
+    "nombre",
+    "apellidos",
+    "dni",
+    "fecha-nacimiento",
+    "grupo-sexo",
+    "email",
+    "telefono",
+    "direccion",
+    "ciudad",
+    "codigo-postal",
+    "altura",
+    "peso",
+    "grupo-condiciones",
+    "objetivos",
+    "grupo-plan",
     "franja-horaria",
     "nif-factura",
     "iban",
@@ -73,11 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 0; i < camposValidados.length; i++) {
       ocultarRequisitos(document.getElementById("req-" + camposValidados[i]));
     }
+    ocultarRequisitos(document.getElementById("req-sexo"));
     ocultarRequisitos(document.getElementById("req-condiciones"));
+    ocultarRequisitos(document.getElementById("req-plan"));
   }
 
   // Aplica el borde o estado visual verde/rojo al campo según su validez
-  function actualizarEstiloCampo(campo, esValido, mostrarErrores, esOpcionalVacio) {
+  function actualizarEstiloCampo(campo, esValido, mostrarErrores, esLibreVacio) {
     if (campo.type === "checkbox") {
       const etiqueta = campo.parentElement;
       if (!esValido && mostrarErrores) {
@@ -96,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     campo.classList.remove("campo-valido", "campo-invalido");
 
-    if (esOpcionalVacio) {
+    if (esLibreVacio) {
       campo.removeAttribute("aria-invalid");
     } else if (esValido) {
       campo.classList.add("campo-valido");
@@ -127,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (id === "altura") return validarAltura(valor, entradaInvalida);
     if (id === "peso") return validarPeso(valor, entradaInvalida);
     if (id === "objetivos") return validarObjetivos(valor);
-    if (id === "plan") return validarPlan(valor);
     if (id === "franja-horaria") return validarFranjaHoraria(valor);
     if (id === "nif-factura") return validarNifFactura(valor);
     if (id === "iban") return validarIban(valor);
@@ -137,12 +168,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return [];
   }
 
-  // Valida un campo, actualiza su borde y muestra u oculta su lista de requisitos
+  // Valida un campo individual, actualiza su borde y muestra u oculta su lista
   function validarCampo(campo, mostrarErrores, mostrarLista) {
     const lista = document.getElementById("req-" + campo.id);
     const requisitos = obtenerRequisitosCampo(campo);
     const esValido = todosRequisitosCumplidos(requisitos);
-    const esOpcionalVacio = requisitos.length === 1 && requisitos[0].cumplido === null;
+    const esLibreVacio = requisitos.length === 1 && requisitos[0].cumplido === null;
 
     if (mostrarLista) {
       mostrarRequisitos(lista, requisitos, mostrarErrores);
@@ -150,15 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
       ocultarRequisitos(lista);
     }
 
-    actualizarEstiloCampo(campo, esValido, mostrarErrores, esOpcionalVacio);
+    actualizarEstiloCampo(campo, esValido, mostrarErrores, esLibreVacio);
 
     return esValido;
   }
 
-  // Valida el grupo de checkboxes de condiciones médicas
-  function validarGrupoCondiciones(mostrarErrores, mostrarLista) {
-    const lista = document.getElementById("req-condiciones");
-    const requisitos = validarCondicionesMedicas(checkboxesCondiciones);
+  // Valida un grupo de radios o checkboxes (sexo, condiciones médicas o plan)
+  function validarGrupoOpciones(contenedor, idLista, requisitos, mostrarErrores, mostrarLista) {
+    const lista = document.getElementById(idLista);
     const esValido = todosRequisitosCumplidos(requisitos);
 
     if (mostrarLista) {
@@ -167,15 +197,55 @@ document.addEventListener("DOMContentLoaded", function () {
       ocultarRequisitos(lista);
     }
 
-    if (grupoCondiciones) {
+    if (contenedor) {
       if (!esValido && mostrarErrores) {
-        grupoCondiciones.classList.add("campo-invalido");
+        contenedor.classList.add("campo-invalido");
       } else {
-        grupoCondiciones.classList.remove("campo-invalido");
+        contenedor.classList.remove("campo-invalido");
       }
     }
 
     return esValido;
+  }
+
+  function validarGrupoSexo(mostrarErrores, mostrarLista) {
+    return validarGrupoOpciones(
+      grupoSexo,
+      "req-sexo",
+      validarSexo(radiosSexo),
+      mostrarErrores,
+      mostrarLista
+    );
+  }
+
+  function validarGrupoCondiciones(mostrarErrores, mostrarLista) {
+    return validarGrupoOpciones(
+      grupoCondiciones,
+      "req-condiciones",
+      validarCondicionesMedicas(checkboxesCondiciones),
+      mostrarErrores,
+      mostrarLista
+    );
+  }
+
+  function validarGrupoPlan(mostrarErrores, mostrarLista) {
+    return validarGrupoOpciones(
+      grupoPlan,
+      "req-plan",
+      validarPlan(radiosPlan),
+      mostrarErrores,
+      mostrarLista
+    );
+  }
+
+  // Resalta la tarjeta del plan de membresía seleccionado
+  function actualizarTarjetasPlan() {
+    for (let i = 0; i < radiosPlan.length; i++) {
+      const tarjeta = radiosPlan[i].closest(".tarjeta-plan");
+      if (tarjeta) {
+        tarjeta.classList.toggle("seleccionada", radiosPlan[i].checked);
+      }
+    }
   }
 
   // Gestiona que "Ninguna" sea excluyente con el resto de condiciones médicas
@@ -237,27 +307,23 @@ document.addEventListener("DOMContentLoaded", function () {
       continue;
     }
 
-    // Al pulsar/entrar en el campo, mostramos solo sus requisitos
     campo.addEventListener("focus", function () {
       ocultarTodosLosRequisitos();
       const yaTocado = campo.dataset.tocado === "true";
       validarCampo(campo, yaTocado, true);
     });
 
-    // Mientras escribe, actualizamos los requisitos en tiempo real
     campo.addEventListener("input", function () {
       ocultarMensajeGeneral();
       const yaTocado = campo.dataset.tocado === "true";
       validarCampo(campo, yaTocado, true);
     });
 
-    // Al salir del campo o pulsar en otro, actualizamos el borde y ocultamos los requisitos
     campo.addEventListener("blur", function () {
       campo.dataset.tocado = "true";
       validarCampo(campo, true, false);
     });
 
-    // En selects, fechas y checkboxes validamos al cambiar el valor
     if (campo.tagName === "SELECT" || campo.type === "date" || campo.type === "checkbox") {
       campo.addEventListener("change", function () {
         ocultarMensajeGeneral();
@@ -267,7 +333,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Conecta los eventos de los checkboxes de condiciones médicas
+  // Eventos del grupo obligatorio de Sexo
+  for (let i = 0; i < radiosSexo.length; i++) {
+    radiosSexo[i].addEventListener("focus", function () {
+      ocultarTodosLosRequisitos();
+      const yaTocado = grupoSexo && grupoSexo.dataset.tocado === "true";
+      validarGrupoSexo(yaTocado, true);
+    });
+
+    radiosSexo[i].addEventListener("change", function () {
+      ocultarMensajeGeneral();
+      if (grupoSexo) {
+        grupoSexo.dataset.tocado = "true";
+      }
+      validarGrupoSexo(true, true);
+    });
+  }
+
+  if (grupoSexo) {
+    grupoSexo.addEventListener("focusout", function (evento) {
+      if (!grupoSexo.contains(evento.relatedTarget)) {
+        grupoSexo.dataset.tocado = "true";
+        validarGrupoSexo(true, false);
+      }
+    });
+  }
+
+  // Eventos del grupo de condiciones médicas
   for (let i = 0; i < checkboxesCondiciones.length; i++) {
     checkboxesCondiciones[i].addEventListener("focus", function () {
       ocultarTodosLosRequisitos();
@@ -285,12 +377,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Al salir del grupo de condiciones médicas, ocultamos su lista de requisitos
   if (grupoCondiciones) {
     grupoCondiciones.addEventListener("focusout", function (evento) {
       if (!grupoCondiciones.contains(evento.relatedTarget)) {
         grupoCondiciones.dataset.tocado = "true";
         validarGrupoCondiciones(true, false);
+      }
+    });
+  }
+
+  // Eventos de las tarjetas del Plan de membresía
+  for (let i = 0; i < radiosPlan.length; i++) {
+    radiosPlan[i].addEventListener("focus", function () {
+      ocultarTodosLosRequisitos();
+      const yaTocado = grupoPlan && grupoPlan.dataset.tocado === "true";
+      validarGrupoPlan(yaTocado, true);
+    });
+
+    radiosPlan[i].addEventListener("change", function () {
+      ocultarMensajeGeneral();
+      if (grupoPlan) {
+        grupoPlan.dataset.tocado = "true";
+      }
+      actualizarTarjetasPlan();
+      validarGrupoPlan(true, true);
+    });
+  }
+
+  if (grupoPlan) {
+    grupoPlan.addEventListener("focusout", function (evento) {
+      if (!grupoPlan.contains(evento.relatedTarget)) {
+        grupoPlan.dataset.tocado = "true";
+        validarGrupoPlan(true, false);
       }
     });
   }
@@ -301,35 +419,41 @@ document.addEventListener("DOMContentLoaded", function () {
     ocultarTodosLosRequisitos();
 
     let totalErrores = 0;
-    let primerCampoConError = null;
-    let errorEnCondiciones = false;
+    let primerElementoError = null;
+    let tipoPrimerError = "";
 
-    for (let i = 0; i < camposValidados.length; i++) {
-      const campo = document.getElementById(camposValidados[i]);
-      if (!campo) {
-        continue;
+    for (let i = 0; i < ordenEnvio.length; i++) {
+      const clave = ordenEnvio[i];
+      let esValido = true;
+      let elementoEnfocar = null;
+
+      if (clave === "grupo-sexo") {
+        if (grupoSexo) grupoSexo.dataset.tocado = "true";
+        esValido = validarGrupoSexo(true, false);
+        elementoEnfocar = radiosSexo[0] || null;
+      } else if (clave === "grupo-condiciones") {
+        if (grupoCondiciones) grupoCondiciones.dataset.tocado = "true";
+        esValido = validarGrupoCondiciones(true, false);
+        elementoEnfocar = checkboxesCondiciones[0] || null;
+      } else if (clave === "grupo-plan") {
+        if (grupoPlan) grupoPlan.dataset.tocado = "true";
+        esValido = validarGrupoPlan(true, false);
+        elementoEnfocar = radiosPlan[0] || null;
+      } else {
+        const campo = document.getElementById(clave);
+        if (campo) {
+          campo.dataset.tocado = "true";
+          esValido = validarCampo(campo, true, false);
+          elementoEnfocar = campo;
+        }
       }
-
-      campo.dataset.tocado = "true";
-      const esValido = validarCampo(campo, true, false);
 
       if (!esValido) {
         totalErrores = totalErrores + 1;
-        if (!primerCampoConError) {
-          primerCampoConError = campo;
+        if (!primerElementoError && elementoEnfocar) {
+          primerElementoError = elementoEnfocar;
+          tipoPrimerError = clave;
         }
-      }
-    }
-
-    if (grupoCondiciones) {
-      grupoCondiciones.dataset.tocado = "true";
-    }
-    const condicionesValidas = validarGrupoCondiciones(true, false);
-    if (!condicionesValidas) {
-      totalErrores = totalErrores + 1;
-      if (!primerCampoConError && checkboxesCondiciones.length > 0) {
-        primerCampoConError = checkboxesCondiciones[0];
-        errorEnCondiciones = true;
       }
     }
 
@@ -341,14 +465,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
       mostrarMensajeGeneral("error", textoError);
 
-      if (primerCampoConError) {
-        primerCampoConError.focus();
-        if (errorEnCondiciones) {
+      if (primerElementoError) {
+        primerElementoError.focus();
+        if (tipoPrimerError === "grupo-sexo") {
+          validarGrupoSexo(true, true);
+        } else if (tipoPrimerError === "grupo-condiciones") {
           validarGrupoCondiciones(true, true);
+        } else if (tipoPrimerError === "grupo-plan") {
+          validarGrupoPlan(true, true);
         } else {
-          validarCampo(primerCampoConError, true, true);
+          validarCampo(primerElementoError, true, true);
         }
-        primerCampoConError.scrollIntoView({ behavior: "smooth", block: "center" });
+        primerElementoError.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     } else {
       const nombreUsuario = document.getElementById("nombre").value.trim();
@@ -362,7 +490,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Limpia mensajes, estados y bloqueos al pulsar "Limpiar formulario"
+  // Limpia mensajes, estados y selecciones al pulsar "Limpiar formulario"
   formulario.addEventListener("reset", function () {
     setTimeout(function () {
       ocultarMensajeGeneral();
@@ -381,10 +509,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      if (grupoCondiciones) {
-        delete grupoCondiciones.dataset.tocado;
-        grupoCondiciones.classList.remove("campo-invalido");
+      const grupos = [grupoSexo, grupoCondiciones, grupoPlan];
+      for (let i = 0; i < grupos.length; i++) {
+        if (grupos[i]) {
+          delete grupos[i].dataset.tocado;
+          grupos[i].classList.remove("campo-invalido");
+        }
       }
+
+      actualizarTarjetasPlan();
 
       for (let i = 0; i < checkboxesCondiciones.length; i++) {
         checkboxesCondiciones[i].disabled = false;

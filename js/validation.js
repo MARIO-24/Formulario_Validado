@@ -2,7 +2,7 @@
    FUNCIONES DE VALIDACIÓN POR CAMPO
    Cada función devuelve una lista de requisitos con:
    - texto: descripción breve del requisito
-   - cumplido: true (verde), false (pendiente/rojo) o null (opcional vacío)
+   - cumplido: true (verde), false (pendiente/rojo) o null (campo libre vacío)
    ============================================================ */
 
 // Calcula la edad exacta en años a partir de una fecha YYYY-MM-DD
@@ -24,18 +24,14 @@ function calcularEdad(fechaTexto) {
   return edad;
 }
 
-// Cuenta cuántas palabras reales (al menos 2 letras) contiene un texto
-function contarPalabras(texto) {
-  const partes = texto.trim().split(/\s+/);
-  let total = 0;
-
-  for (let i = 0; i < partes.length; i++) {
-    if (/[A-Za-zÁÉÍÓÚáéíóúÑñÜü]{2,}/.test(partes[i])) {
-      total = total + 1;
+// Comprueba si hay al menos una opción marcada en un grupo de radios o checkboxes
+function hayOpcionMarcada(listaOpciones) {
+  for (let i = 0; i < listaOpciones.length; i++) {
+    if (listaOpciones[i].checked) {
+      return true;
     }
   }
-
-  return total;
+  return false;
 }
 
 function validarNombre(valor) {
@@ -89,6 +85,12 @@ function validarFechaNacimiento(valor) {
   return [
     { texto: "Campo obligatorio", cumplido: tieneFecha },
     { texto: "Edad mínima de 16 años (y menor de 120)", cumplido: edadValida }
+  ];
+}
+
+function validarSexo(radios) {
+  return [
+    { texto: "Selecciona una opción (Masculino, Femenino u Otro)", cumplido: hayOpcionMarcada(radios) }
   ];
 }
 
@@ -181,36 +183,29 @@ function validarPeso(valor, entradaInvalida) {
 }
 
 function validarCondicionesMedicas(checkboxes) {
-  let algunaMarcada = false;
-
-  for (let i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      algunaMarcada = true;
-      break;
-    }
-  }
-
   return [
-    { texto: 'Selecciona al menos una opción (o marca "Ninguna")', cumplido: algunaMarcada }
+    { texto: 'Selecciona al menos una opción (o marca "Ninguna")', cumplido: hayOpcionMarcada(checkboxes) }
   ];
 }
 
 function validarObjetivos(valor) {
   const texto = valor.trim();
-  const tieneTexto = texto.length > 0;
-  const suficientesPalabras = contarPalabras(texto) >= 3;
-  const longitudMaxima = tieneTexto && texto.length <= 500;
+
+  // No es obligatorio: si queda vacío no genera error
+  if (texto === "") {
+    return [
+      { texto: "No obligatorio (máximo 500 caracteres)", cumplido: null }
+    ];
+  }
 
   return [
-    { texto: "Campo obligatorio", cumplido: tieneTexto },
-    { texto: "Escribe al menos 3 palabras", cumplido: suficientesPalabras },
-    { texto: "Máximo 500 caracteres", cumplido: longitudMaxima }
+    { texto: "Máximo 500 caracteres (" + texto.length + "/500)", cumplido: texto.length <= 500 }
   ];
 }
 
-function validarPlan(valor) {
+function validarPlan(radios) {
   return [
-    { texto: "Selecciona un plan de membresía", cumplido: valor !== "" }
+    { texto: "Selecciona un plan de membresía", cumplido: hayOpcionMarcada(radios) }
   ];
 }
 
@@ -223,10 +218,10 @@ function validarFranjaHoraria(valor) {
 function validarNifFactura(valor) {
   const texto = valor.trim().toUpperCase();
 
-  // Al ser opcional, si queda vacío no genera error
+  // Si queda vacío no genera error
   if (texto === "") {
     return [
-      { texto: "Campo opcional (déjalo vacío si coincide con tu DNI)", cumplido: null }
+      { texto: "Déjalo vacío si coincide con tu DNI", cumplido: null }
     ];
   }
 

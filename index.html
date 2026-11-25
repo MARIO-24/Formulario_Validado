@@ -13,10 +13,10 @@
       <header class="cabecera">
         <h1>Inscripción al Gimnasio</h1>
         <p class="subtitulo">
-          Completa los datos para tramitar tu alta. Los requisitos de cada campo se actualizan en tiempo real mientras escribes.
+          Completa tus datos para tramitar el alta. Al pulsar en cada campo verás sus requisitos actualizados en tiempo real.
         </p>
         <p class="nota-obligatorios">
-          Los campos con <span class="obligatorio">*</span> son obligatorios. Los demás están indicados como opcionales.
+          <span class="obligatorio">*</span> Indica que el campo es obligatorio.
         </p>
       </header>
 
@@ -91,22 +91,30 @@
 
           <div class="fila fila-dos">
             <div class="campo">
-              <label for="sexo">Sexo <span class="opcional">(Opcional)</span></label>
-              <select id="sexo" name="sexo">
-                <option value="">Selecciona una opción</option>
-                <option value="femenino">Femenino</option>
-                <option value="masculino">Masculino</option>
-                <option value="no-indicar">Prefiero no decirlo</option>
-              </select>
+              <span class="etiqueta-grupo">Sexo <span class="obligatorio">*</span></span>
+              <div class="grupo-opciones" id="grupo-sexo" role="radiogroup" aria-label="Sexo">
+                <label class="opcion-chip">
+                  <input type="radio" name="sexo" value="masculino" required>
+                  <span>Masculino</span>
+                </label>
+                <label class="opcion-chip">
+                  <input type="radio" name="sexo" value="femenino" required>
+                  <span>Femenino</span>
+                </label>
+                <label class="opcion-chip">
+                  <input type="radio" name="sexo" value="otro" required>
+                  <span>Otro</span>
+                </label>
+              </div>
+              <ul class="requisitos" id="req-sexo" aria-live="polite"></ul>
             </div>
 
             <div class="campo">
-              <label for="estado-civil">Estado civil <span class="opcional">(Opcional)</span></label>
+              <label for="estado-civil">Estado civil</label>
               <select id="estado-civil" name="estado_civil">
                 <option value="">Selecciona una opción</option>
                 <option value="soltero">Soltero/a</option>
                 <option value="casado">Casado/a</option>
-                <option value="pareja">Pareja de hecho</option>
                 <option value="divorciado">Divorciado/a</option>
                 <option value="viudo">Viudo/a</option>
               </select>
@@ -149,7 +157,7 @@
           </div>
 
           <div class="campo">
-            <span class="etiqueta-grupo">Preferencia de contacto <span class="opcional">(Opcional)</span></span>
+            <span class="etiqueta-grupo">Preferencia de contacto</span>
             <div class="grupo-opciones">
               <label class="opcion-chip">
                 <input type="radio" name="contacto_pref" value="email" checked>
@@ -257,7 +265,7 @@
             </div>
 
             <div class="campo">
-              <label for="nivel-actividad">Nivel de actividad <span class="opcional">(Opcional)</span></label>
+              <label for="nivel-actividad">Nivel de actividad</label>
               <select id="nivel-actividad" name="nivel_actividad">
                 <option value="">Selecciona una opción</option>
                 <option value="sedentario">Sedentario</option>
@@ -302,13 +310,12 @@
           <legend class="titulo-seccion">5. Objetivos deportivos</legend>
 
           <div class="campo">
-            <label for="objetivos">Objetivos principales <span class="obligatorio">*</span></label>
+            <label for="objetivos">Objetivos principales</label>
             <textarea
               id="objetivos"
               name="objetivos"
               rows="3"
               placeholder="Ej. Mejorar mi resistencia, ganar masa muscular y mantener hábitos saludables..."
-              required
               maxlength="500"
             ></textarea>
             <ul class="requisitos" id="req-objetivos" aria-live="polite"></ul>
@@ -319,42 +326,77 @@
         <fieldset class="seccion">
           <legend class="titulo-seccion">6. Tipo de membresía</legend>
 
-          <div class="fila fila-dos">
-            <div class="campo">
-              <label for="plan">Plan de membresía <span class="obligatorio">*</span></label>
-              <select id="plan" name="plan" required>
-                <option value="">Selecciona un plan</option>
-                <option value="mensual">Mensual — 29 €/mes</option>
-                <option value="trimestral">Trimestral (-5%) — 27,55 €/mes</option>
-                <option value="anual">Anual (-12%) — 25,50 €/mes</option>
-                <option value="premium">Premium + Clases — 49 €/mes</option>
-              </select>
-              <ul class="requisitos" id="req-plan" aria-live="polite"></ul>
-            </div>
+          <div class="campo">
+            <span class="etiqueta-grupo">Plan de membresía <span class="obligatorio">*</span></span>
+            <div class="lista-planes" id="grupo-plan" role="radiogroup" aria-label="Plan de membresía">
+              <label class="tarjeta-plan">
+                <div class="plan-cabecera">
+                  <input type="radio" name="plan" value="mensual" required>
+                  <span class="plan-titulo">Plan Mensual</span>
+                  <span class="plan-precio">29 €/mes</span>
+                </div>
+                <p class="plan-subtitulo">Sin permanencia · Pago mes a mes</p>
+                <ul class="plan-ventajas">
+                  <li>Acceso completo a sala de musculación y cardio</li>
+                  <li>Vestuarios, duchas y taquillas de uso diario</li>
+                  <li>Baja flexible en cualquier momento</li>
+                </ul>
+              </label>
 
-            <div class="campo">
-              <label for="referido">¿Quién te refirió? <span class="opcional">(Opcional)</span></label>
-              <input
-                type="text"
-                id="referido"
-                name="referido"
-                placeholder="Nombre de amigo o código promocional"
-                maxlength="30"
-              >
+              <label class="tarjeta-plan">
+                <div class="plan-cabecera">
+                  <input type="radio" name="plan" value="trimestral" required>
+                  <span class="plan-titulo">Plan Trimestral</span>
+                  <span class="plan-precio">27,55 €/mes</span>
+                </div>
+                <p class="plan-subtitulo">Ahorra un 5% · 82,65 € cada 3 meses</p>
+                <ul class="plan-ventajas">
+                  <li>Todo lo incluido en el Plan Mensual</li>
+                  <li>Valoración física inicial gratuita</li>
+                  <li>Rutina de entrenamiento adaptada a tu nivel</li>
+                </ul>
+              </label>
+
+              <label class="tarjeta-plan">
+                <div class="plan-cabecera">
+                  <input type="radio" name="plan" value="anual" required>
+                  <span class="plan-titulo">Plan Anual</span>
+                  <span class="plan-precio">25,50 €/mes</span>
+                </div>
+                <p class="plan-subtitulo">Ahorra un 12% · 306 € al año</p>
+                <ul class="plan-ventajas">
+                  <li>Todo lo incluido en el Plan Trimestral</li>
+                  <li>Matrícula gratuita al darte de alta</li>
+                  <li>2 sesiones con entrenador personal al año</li>
+                </ul>
+              </label>
+
+              <label class="tarjeta-plan">
+                <div class="plan-cabecera">
+                  <input type="radio" name="plan" value="premium" required>
+                  <span class="plan-titulo">Plan Premium + Clases</span>
+                  <span class="plan-precio">49 €/mes</span>
+                </div>
+                <p class="plan-subtitulo">Experiencia completa · Sin límites</p>
+                <ul class="plan-ventajas">
+                  <li>Acceso total a sala, cardio y zona funcional</li>
+                  <li>Clases grupales ilimitadas (Spinning, CrossFit, Yoga, Pilates y Boxeo)</li>
+                  <li>Seguimiento mensual y 2 invitaciones al mes para amigos</li>
+                </ul>
+              </label>
             </div>
+            <ul class="requisitos" id="req-plan" aria-live="polite"></ul>
           </div>
 
-          <div class="resumen-tarifas">
-            <div class="tarifa-item">
-              <span class="tarifa-nombre">Plan Básico</span>
-              <span class="tarifa-precio">29 €/mes</span>
-              <span class="tarifa-detalle">Acceso completo a sala de musculación y cardio</span>
-            </div>
-            <div class="tarifa-item">
-              <span class="tarifa-nombre">Plan Premium</span>
-              <span class="tarifa-precio">49 €/mes</span>
-              <span class="tarifa-detalle">Incluye sala, clases grupales ilimitadas y seguimiento</span>
-            </div>
+          <div class="campo">
+            <label for="referido">¿Quién te refirió?</label>
+            <input
+              type="text"
+              id="referido"
+              name="referido"
+              placeholder="Nombre de amigo o código promocional"
+              maxlength="30"
+            >
           </div>
         </fieldset>
 
@@ -377,7 +419,7 @@
             </div>
 
             <div class="campo">
-              <label for="clases">Clases grupales <span class="opcional">(Opcional)</span></label>
+              <label for="clases">Clases grupales</label>
               <select id="clases" name="clases" multiple size="4">
                 <option value="spinning">Spinning</option>
                 <option value="crossfit">CrossFit</option>
@@ -390,7 +432,7 @@
           </div>
 
           <div class="campo">
-            <span class="etiqueta-grupo">Días preferidos <span class="opcional">(Opcional)</span></span>
+            <span class="etiqueta-grupo">Días preferidos</span>
             <div class="grupo-opciones">
               <label class="opcion-chip"><input type="checkbox" name="dias" value="lu"><span>Lun</span></label>
               <label class="opcion-chip"><input type="checkbox" name="dias" value="ma"><span>Mar</span></label>
@@ -408,7 +450,7 @@
 
           <div class="fila fila-tres">
             <div class="campo">
-              <label for="nif-factura">NIF / NIE para factura <span class="opcional">(Opcional)</span></label>
+              <label for="nif-factura">NIF / NIE para factura</label>
               <input
                 type="text"
                 id="nif-factura"
@@ -420,7 +462,7 @@
             </div>
 
             <div class="campo">
-              <label for="direccion-factura">Dirección de facturación <span class="opcional">(Opcional)</span></label>
+              <label for="direccion-factura">Dirección de facturación</label>
               <input
                 type="text"
                 id="direccion-factura"
@@ -471,7 +513,7 @@
           <div class="campo campo-checkbox">
             <label class="etiqueta-checkbox" for="promo">
               <input type="checkbox" id="promo" name="promo">
-              <span>Deseo recibir promociones y novedades por correo electrónico <span class="opcional">(Opcional)</span></span>
+              <span>Deseo recibir promociones y novedades por correo electrónico</span>
             </label>
           </div>
         </fieldset>
